@@ -4,6 +4,43 @@
 
 #include "matrice.h"
 
+matrice *lire_vector_fixe(char *fichier)
+{
+
+  FILE *f = fopen(fichier, "r");
+  matrice *vec = aligned_alloc(64,sizeof(matrice));
+  
+  while (fgets(temp,256,f))
+  {
+   if (matrix->nb_colonnes == 1)
+   {
+     for(int i=0; i<nb_lignes; i++)
+     {     
+            double v = 0.0;
+            sscanf(buffer, "%lf\n", &v);
+            matrix->value[i]=v;
+     }  
+   }
+
+  }
+  fclose(f);
+  return vec;
+}
+
+
+
+double dotprod_simple(matrix_t *x, matrix_t *y,int taille)
+{
+  double s=0.0;
+  
+  for (int i=0; i<taille; i++)
+  {
+    s= s+x->value[i]*y->value[i];
+  }
+  
+  return s;
+}
+
 
 void desaloc_mat(matrice *mat)
 {
@@ -62,6 +99,7 @@ matrice *lire_matrice_fixe(char *fichier)
   }
   fclose(f);
   return mat;
+  
 }
 
 
