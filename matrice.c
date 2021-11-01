@@ -5,7 +5,28 @@
 #include "matrice.h"
 
 
+double norme(matrice* x,int taille)
+{
 
+ double a=dotprod_simple(x,x,taille);
+ return sqrt(a);
+
+}
+
+
+
+
+double dotprod_simple(matrice* x, matrice* y,int taille)
+{
+  double s=0.0;
+  
+  for (int i=0; i<taille; i++)
+  {
+    s= s+x->valeur[i]*y->valeur[i];
+  }
+  
+  return s;
+}
 
 matrice *lire_vector_fixe(char *fichier)
 {
@@ -42,18 +63,6 @@ matrice *lire_vector_fixe(char *fichier)
 }
 
 
-
-double dotprod_simple(matrice* x, matrice* y,int taille)
-{
-  double s=0.0;
-  
-  for (int i=0; i<taille; i++)
-  {
-    s= s+x->valeur[i]*y->valeur[i];
-  }
-  
-  return s;
-}
 
 matrice *lire_matrice(int n, double x, double y) {
 
