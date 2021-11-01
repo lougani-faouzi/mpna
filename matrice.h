@@ -9,7 +9,7 @@ struct matrice_
   
 };
 typedef struct matrice_ matrice;
-
+double norme_frobenius(int , int ,matrice* mat);
 double norme(matrice* x,int taille);
 
 matrice *lire_vector(int);

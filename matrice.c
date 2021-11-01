@@ -5,6 +5,24 @@
 #include "matrice.h"
 
 
+
+double norme_frobenius(int nb_lig, int nb_col,matrice* mat)
+{
+
+ double temp = 0.0;
+ double norm = 0.0;
+
+  for (int i = 0; i < nb_lig * nb_col; i++)
+  {
+	temp=temp + mat->valeur[i] * mat->valeur[i];
+  }
+   
+   norm=sqrt(temp);
+   
+   return norm;
+   
+}
+
 double norme(matrice* x,int taille)
 {
 

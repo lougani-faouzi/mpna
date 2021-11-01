@@ -10,7 +10,7 @@ TARGET=main.exe
 all: $(TARGET)
 
 $(TARGET): main.o matrice.o
-	$(CC) $(LFLAGS) $^ -o $@
+	$(CC) $(LFLAGS) $^ -o $@ -lm
 
 %.o: %.c
 	$(CC) -c $(CFLAGS) $(OFLAGS) $< -o $@
