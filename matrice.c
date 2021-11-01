@@ -4,41 +4,103 @@
 
 #include "matrice.h"
 
+
+
+
 matrice *lire_vector_fixe(char *fichier)
 {
-
+  char buffer[256];
+  int  lecture=0;
   FILE *f = fopen(fichier, "r");
   matrice *vec = aligned_alloc(64,sizeof(matrice));
   
-  while (fgets(temp,256,f))
+  while (fgets(buffer,256,f))
   {
-   if (matrix->nb_colonnes == 1)
+      
+  
+  if ((lecture==1)&&(buffer[0]!='%'))
+  {
+   int taille;
+   sscanf(buffer,"%d %d %d\n",&(vec->nb_lignes),&(vec->nb_colonnes),&taille);  
+   if (vec->nb_colonnes == 1)
    {
-     for(int i=0; i<nb_lignes; i++)
+     for(int i=0; i<vec->nb_lignes; i++)
      {     
             double v = 0.0;
             sscanf(buffer, "%lf\n", &v);
-            matrix->value[i]=v;
+            vec->valeur[i]=v;
+            lecture=1;
      }  
+    
    }
 
   }
+  
+ }
   fclose(f);
   return vec;
 }
 
 
 
-double dotprod_simple(matrix_t *x, matrix_t *y,int taille)
+double dotprod_simple(matrice* x, matrice* y,int taille)
 {
   double s=0.0;
   
   for (int i=0; i<taille; i++)
   {
-    s= s+x->value[i]*y->value[i];
+    s= s+x->valeur[i]*y->valeur[i];
   }
   
   return s;
+}
+
+matrice *lire_matrice(int n, double x, double y) {
+
+  matrice *mat = aligned_alloc(64,sizeof(matrice));
+  mat->nb_lignes=n;
+  mat->nb_colonnes=n;
+  mat->valeur= (double *)aligned_alloc(64,sizeof(double)*(mat->nb_lignes*mat->nb_colonnes));
+  
+  int j=n;
+  for(int i = 1; i < n - 1; i++)
+  {
+	mat->valeur[j+i]=x;
+  	mat->valeur[j+i+1]=y;
+  	mat->valeur[j+i-1]=y;
+  	j=j+n;
+  }
+  mat->valeur[0]=x;
+  mat->valeur[n*n-1]=x;
+  mat->valeur[1]=y;
+  mat->valeur[n*n-2]=y;
+  
+  return mat;
+}
+
+
+matrice *lire_vector(int n) {
+  // a renvoir car return a vec avec 1 comme val
+
+  matrice *vec = aligned_alloc(64,sizeof(matrice));
+  vec->nb_lignes=n;
+  vec->nb_colonnes=1;
+  vec->valeur= (double *)aligned_alloc(64,sizeof(double)*(vec->nb_lignes*vec->nb_colonnes));
+  
+  
+  for (int i = 0; i < n; i++) {
+    vec->valeur[i] = 1.0;
+  }
+ 
+  return vec;
+
+}
+
+void AfficheVecteur(matrice* vec)
+{
+	for (int i=0; i<vec->nb_lignes ; i++)
+	printf("%lf\n",vec->valeur[i]);
+
 }
 
 
@@ -48,6 +110,11 @@ void desaloc_mat(matrice *mat)
   free(mat);
 }
 
+void desaloc_vec(matrice *vec)
+{
+  free(vec->valeur);
+  free(vec);
+}
 void AfficheMatrice(matrice *matrix)
 {
   
@@ -101,6 +168,10 @@ matrice *lire_matrice_fixe(char *fichier)
   return mat;
   
 }
+
+
+
+
 
 
 

@@ -2,19 +2,31 @@
 #include <math.h>
 #include "matrice.h"
 
-int main(int argc, char **argv)
+int main()
 {
-        matrice *matrix = lire_matrice_fixe(argv[1]);
-        switch (argc)
-	{
-          case 2: 
-      		 AfficheMatrice(matrix);
-      		 desaloc_mat(matrix); 
-          break;
+         // matrice *mat =matrix_aI(4, 1);
+          matrice *vec =lire_vector(4);
+      
+       // AfficheMatrice(vec);
+       
+       // switch (argc)
+	//{
+        //  case 2: 
+                 AfficheVecteur(vec);
+      		 //AfficheMatrice(vec);
+      		 //desaloc_mat(vec);  
+      		// AfficheVecteur(vec);
+               // desaloc_vec(vec);
+       //   case 3:
+          
+          
+       //   break;
 
-         default : printf("\n neant");
+       //  default : printf("\n neant");
 
-        } 
+       // } 
+        
+        //double dotp=dotprod_simple(vec,vec,int taille);
         
        
   return 0;
