@@ -4,19 +4,23 @@
 
 int main()
 {
-         // matrice *mat =matrix_aI(4, 1);
+          matrice *mat =lire_matrice(5, 2, 1);
+          AfficheMatrice(mat);
+          desaloc_vec(mat);
+          
+          printf("\n");
           matrice *vec =lire_vector(4);
-      
-       // AfficheMatrice(vec);
+          AfficheVecteur(vec);
+          //desaloc_mat(vec);  
+          
+          //simple dot prod 
+          printf("\n");
+          printf("%lf",dotprod_simple(vec,vec,4));
+          
+          //
        
-       // switch (argc)
-	//{
-        //  case 2: 
-                 AfficheVecteur(vec);
-      		 //AfficheMatrice(vec);
-      		 //desaloc_mat(vec);  
       		// AfficheVecteur(vec);
-               // desaloc_vec(vec);
+                
        //   case 3:
           
           
