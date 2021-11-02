@@ -1,9 +1,10 @@
 #include <stdio.h>
 #include <math.h>
+#include <stdlib.h>
 #include "matrice.h"
 
 int main()
-{   
+{        /*
           printf("\nlecture matrice\n" );
           matrice *mat =lire_matrice(5, 2, 1);
           AfficheMatrice(mat);
@@ -24,7 +25,18 @@ int main()
       	  
       	  //norme frobenieus d'une matrice
       	  printf("\n norme frobenieus\n");
-      	  printf("%lf",norme_frobenius(mat->nb_lignes,mat->nb_colonnes,mat));
+      	  printf("%lf",norme_frobenius(mat));
+      	  */
+      	  
+      	  // arnoldi 
+      	  
+      	  printf("\n arnoldi \n");
+      	  double A[] = {1, 0, 1, 1, 1, 1, -1, -1, 0};
+      	  double *H = malloc(sizeof(double) * 12);
+          double *V = malloc(sizeof(double) * 12);
+          double b[] = {0, 1, 1};
+          arnoldi(3, 3, A, b, H, V);
+      	  printf("\n arnoldi \n");
       	  
       	  // AfficheVecteur(vec);
                 

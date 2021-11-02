@@ -9,11 +9,14 @@ struct matrice_
   
 };
 typedef struct matrice_ matrice;
-double norme_frobenius(int , int ,matrice* mat);
-double norme(matrice* x,int taille);
+
+double dotprod_simple(double *, double *,int);
+double norme_frobenius(int , int ,double *);
+double norme(double *,int );
+double *lire_matrice(int, double, double);
+void affiche_matrice(double *, int, int);
 
 matrice *lire_vector(int);
-matrice *lire_matrice(int, double, double);
 matrice *lire_vector_fixe(char *fichier);
 matrice *lire_matrice_fixe(char *fichier);
 
@@ -22,6 +25,6 @@ void AfficheMatrice(matrice *matrix);
 void desaloc_mat(matrice *matrix);
 void desaloc_vec(matrice *vec);
 void AfficheVecteur(matrice* vec);
-double dotprod_simple(matrice* x, matrice* y,int);
+
 
 #endif 

@@ -1,7 +1,7 @@
 CC=gcc
 CFLAGS=-Wall -Wextra 
 OFLAGS=-O2 -march=native -mtune=native
-LFLAGS=-lm
+LFLAGS=-lm -llapack -llapacke
 
 TARGET=main.exe
 

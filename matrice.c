@@ -1,12 +1,139 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
-
+#include <lapacke.h>
 #include "matrice.h"
 
+void blas2_dgemv(char trans, int m, int n, double a, double *A, int lda, double *x,double b, double *y)
+{
+
+  int taille_x,taille_y;
+  
+  if (trans == 'N' )
+  {
+    taille_x = n;
+    taille_y = m;
+    
+    int ky=0;
+    int i=0,j=0;
+    
+    while(i<taille_x)
+    {
+    	while(j<taille_y)
+    	{
+    		y[j] = y[j]+ a * A[ky + j] * x[i];
+    		j++;
+    	}
+    	i++;
+    	ky=ky+lda;
+    }
+    
+  }else {
+  
+    // y = a*A**T*x + y
+    taille_x = m;
+    taille_y = n;
+    int kx = 0;
+    int i=0,j=0,k=0;
+    while(i<taille_x)
+    {
+    	while(j<taille_y)
+    	{
+    	  y[i]= y[i]+ a * A[kx + j] * x[j];
+    	  j++;
+    	}
+    	  i++;
+          kx=kx+lda;
+          
+    }	
+  }
+
+  // y = b*y
+    if (b == 0)
+    { 
+       while(k<taille_y)
+       {
+        y[k] = 0;
+        k++;
+       }
+    } 
+    else
+    { 
+      k=0;
+      while(k<taille_y)
+      {
+      y[k]=b*y[k];
+      k++;
+      }
+      
+    } 
+   
+  
+    if (a == 0)
+    return;
+
+}
+/*
+  A la matrice 
+  b le vecteur initial
+  n la taille de la matrice A
+  m la taille du sous espace de projection
+  H la matrice hessenberg 
+  V la matrice unitaire 
+
+*/
+
+void arnoldi(int n, int m, double *A, double *b, double *H, double *V) 
+{
+    // on copie le vecteur b dans V
+    for(int i=0; i<n; i++)
+    {
+      V[i]=b[i];  
+    }
+    
+    // 
+    double e=1.0/norme(V,n);
+    
+    for(int i=0; i<n; i++)
+    {
+      V[i]=e*V[i];
+    }
+    
+    int k= n;
+    int h = 0;
+    int j=1;
+    
+    while (j<m)
+    {
+      //dgemv_('n', n, n, 1, A, n, &V[k-n],0,&V[k]);
+      
+      for(int i=0; i<n; i++)
+      {
+      	
+      	H[h+i] = dotprod_simple(&V[k],&V[i*n],n);
+      	for (int r=0; r<n; r++)
+      	{
+      		V[k]=-(H[h+ i])*V[i*n]+V[k];
+      	}
+ 
+      }
+      H[h+j] = norme(&V[k],n);
+      for (int t=0; t<n; t++)
+      {
+              V[k]= (1.0/H[h+j]) * V[k];
+      }
+
+      k=k+n;
+      h=h+m+1;
+      
+      j++;
+    }
+   
+
+}
 
 
-double norme_frobenius(int nb_lig, int nb_col,matrice* mat)
+double norme_frobenius(int nb_lig, int nb_col,double *mat)
 {
 
  double temp = 0.0;
@@ -14,7 +141,7 @@ double norme_frobenius(int nb_lig, int nb_col,matrice* mat)
 
   for (int i = 0; i < nb_lig * nb_col; i++)
   {
-	temp=temp + mat->valeur[i] * mat->valeur[i];
+	temp=temp + mat[i] * mat[i];
   }
    
    norm=sqrt(temp);
@@ -23,7 +150,8 @@ double norme_frobenius(int nb_lig, int nb_col,matrice* mat)
    
 }
 
-double norme(matrice* x,int taille)
+
+double norme(double *x,int taille)
 {
 
  double a=dotprod_simple(x,x,taille);
@@ -34,13 +162,13 @@ double norme(matrice* x,int taille)
 
 
 
-double dotprod_simple(matrice* x, matrice* y,int taille)
+double dotprod_simple(double *x, double *y,int taille)
 {
   double s=0.0;
   
   for (int i=0; i<taille; i++)
   {
-    s= s+x->valeur[i]*y->valeur[i];
+    s= s+x[i]*y[i];
   }
   
   return s;
@@ -80,7 +208,7 @@ matrice *lire_vector_fixe(char *fichier)
   return vec;
 }
 
-
+/*
 
 matrice *lire_matrice(int n, double x, double y) {
 
@@ -105,7 +233,8 @@ matrice *lire_matrice(int n, double x, double y) {
   return mat;
 }
 
-
+*/
+/*
 matrice *lire_vector(int n) {
   // a renvoir car return a vec avec 1 comme val
 
@@ -122,6 +251,8 @@ matrice *lire_vector(int n) {
   return vec;
 
 }
+
+*/
 
 void AfficheVecteur(matrice* vec)
 {
