@@ -1,4 +1,4 @@
-<<<<<<< HEAD
+
 
 **Rendu Tps Méthodes et Programmation Numériques Avancées***
                                      
@@ -22,7 +22,7 @@ make clean
 #+END_SRC
 
 
-=======
+
 ** Pour executer:
 
 #+BEGIN_SRC bash
@@ -30,4 +30,4 @@ make
 ./main.exe
 make clean
 #+END_SRC
->>>>>>> 7b33b48f9ab132fdb556124876a4ac52149cccd7
+
