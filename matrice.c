@@ -1,11 +1,12 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
-#include <lapacke.h>
+#include <omp.h>
 #include "matrice.h"
 
 void affiche_matrice_ligne(int n, int m, double *mat) {
   int temp;
+  #pragma omp for 
   for (int i = 0; i < n; i++) {
     temp = 0;
     for (int j = 0; j < m; j++) {
@@ -19,18 +20,21 @@ void affiche_matrice_ligne(int n, int m, double *mat) {
 
 
 void scal_fois_vect(int n, double scal, double *vect) {
+  #pragma omp for 
   for (int i = 0; i < n; i++) {
     vect[i]= scal * vect[i];
   }
 }
 
 void copier_vect_vect(int n, double *vect_a, double *vect_b) {
+ #pragma omp for 
   for (int i = 0; i < n; i++) {
     vect_b[i]=vect_a[i];
   }
 }
 
 void scal_fois_vect_plus_vect(int n, double scal, double *vect_a, double *vect_b) {
+  #pragma omp for 
   for (int i = 0; i < n; i++) {
     vect_b[i] = scal * vect_a[i] + vect_b[i];
   }
@@ -39,6 +43,7 @@ void scal_fois_vect_plus_vect(int n, double scal, double *vect_a, double *vect_b
 double somme_mul_vect_vect(int n, double *vect_a, double *vect_b) {
   
   double somme = 0.0;
+  #pragma omp for 
   for (int i = 0; i < n; i++) {
     somme = somme + vect_a[i] * vect_b[i];
   }
@@ -58,6 +63,7 @@ double *Modified_gs(int n, double *A) {
     copier_vect_vect(n,&A[cpt],&vect_w[cpt]);
     
     // for j=1:k-1, rjk= qtjw ,w = w −rjkq end 
+    #pragma omp for 
     for (int j = 0; j < k; j++) {
       coef[j] = somme_mul_vect_vect(n,&vect_w[cpt],&vect_w[j*n]);
       scal_fois_vect_plus_vect(n,-coef[j],&vect_w[j * n], &vect_w[cpt]);
@@ -86,10 +92,12 @@ double *Classical_gs(int n, double *A) {
     copier_vect_vect(n,&A[cpt],&vect_w[cpt]);
 
     // for j = 1:k-1, rjk= qtjw end
+    #pragma omp for 
     for (int j = 0; j < k; j++)
       coef[j] = somme_mul_vect_vect(n,&vect_w[cpt],&vect_w[j * n]);
 
     // for j = 1:k-1,  w = w −rjkqj end 
+    #pragma omp for 
     for (int j = 0; j < k; j++)
       scal_fois_vect_plus_vect(n,-coef[j],&vect_w[j * n],&vect_w[cpt]);
 
@@ -119,6 +127,7 @@ void matrice_carre(double **A, int n)
 double scal(double **V, int j, int i, int m)
 {
 	double S = 0;
+	#pragma omp for 
 	for (int k = 0; k < m; ++k)
 	{
 		S = S + V[j][k]*V[i][k]; 
@@ -131,7 +140,7 @@ double scal(double **V, int j, int i, int m)
 
 void dotprod_2(double **A, double **V, int j, int n, int m)
 {
-	
+	#pragma omp for 
 	for (int i = 0; i < n; ++i)
 	{
 		for (int k = 0; k < m; ++k)
@@ -157,6 +166,7 @@ void arnoldi(double **A, double *v, int n, int m, double **H, double **V)
 
 	// Initialisation de V1
 	double nb = norme(v, m);
+	#pragma omp for 
 	for (int i = 0; i < m; ++i)
 	{
 		V[0][i] = v[i] / nb;
@@ -164,13 +174,16 @@ void arnoldi(double **A, double *v, int n, int m, double **H, double **V)
 
 
 	// boucle de calcul global
+	#pragma omp for 
 	for (int j = 0; j < m-1; ++j)
 	{
 		dotprod_2(A, V, j, n, m);
+		#pragma omp for 
 		for (int i = 0; i < j; ++i)
 		{
 			H[i][j] = scal(V, j+1, i, m);
 			//ici on doit calculer calcul de Vj+1
+			#pragma omp for 
 			for (int k = 0; k < m; ++k)
 			{
 				V[j+1][k] = V[j+1][k] - V[i][k]*H[i][j];
@@ -183,6 +196,7 @@ void arnoldi(double **A, double *v, int n, int m, double **H, double **V)
 			return ;
 		}
 		//ici on doit calculer de H[j+1][j]
+		#pragma omp for 
 		for (int k = 0; k < m; ++k)
 		{
 			V[j+1][k] = V[j+1][k]/H[j+1][j];
@@ -198,7 +212,7 @@ double norme_frobenius(int nb_lig, int nb_col,double *mat)
 
  double temp = 0.0;
  double norm = 0.0;
-
+  #pragma omp for 
   for (int i = 0; i < nb_lig * nb_col; i++)
   {
 	temp=temp + mat[i] * mat[i];
