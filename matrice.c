@@ -4,133 +4,193 @@
 #include <lapacke.h>
 #include "matrice.h"
 
-void blas2_dgemv(char trans, int m, int n, double a, double *A, int lda, double *x,double b, double *y)
-{
-
-  int taille_x,taille_y;
-  
-  if (trans == 'N' )
-  {
-    taille_x = n;
-    taille_y = m;
-    
-    int ky=0;
-    int i=0,j=0;
-    
-    while(i<taille_x)
-    {
-    	while(j<taille_y)
-    	{
-    		y[j] = y[j]+ a * A[ky + j] * x[i];
-    		j++;
-    	}
-    	i++;
-    	ky=ky+lda;
+void affiche_matrice_ligne(int n, int m, double *mat) {
+  int temp;
+  for (int i = 0; i < n; i++) {
+    temp = 0;
+    for (int j = 0; j < m; j++) {
+      printf("%lf ", mat[temp+i]);
+      temp=temp+n;
     }
-    
-  }else {
+    printf("\n");
+  }
+}
+
+
+
+void scal_fois_vect(int n, double scal, double *vect) {
+  for (int i = 0; i < n; i++) {
+    vect[i]= scal * vect[i];
+  }
+}
+
+void copier_vect_vect(int n, double *vect_a, double *vect_b) {
+  for (int i = 0; i < n; i++) {
+    vect_b[i]=vect_a[i];
+  }
+}
+
+void scal_fois_vect_plus_vect(int n, double scal, double *vect_a, double *vect_b) {
+  for (int i = 0; i < n; i++) {
+    vect_b[i] = scal * vect_a[i] + vect_b[i];
+  }
+}
+
+double somme_mul_vect_vect(int n, double *vect_a, double *vect_b) {
   
-    // y = a*A**T*x + y
-    taille_x = m;
-    taille_y = n;
-    int kx = 0;
-    int i=0,j=0,k=0;
-    while(i<taille_x)
-    {
-    	while(j<taille_y)
-    	{
-    	  y[i]= y[i]+ a * A[kx + j] * x[j];
-    	  j++;
-    	}
-    	  i++;
-          kx=kx+lda;
-          
-    }	
+  double somme = 0.0;
+  for (int i = 0; i < n; i++) {
+    somme = somme + vect_a[i] * vect_b[i];
+  }
+  return somme;
+}
+
+
+double *Modified_gs(int n, double *A) {
+  
+  int cpt = 0;
+  double *coef,*vect_w;
+  coef= malloc(sizeof(double)*n);
+  vect_w= malloc(sizeof(double)*n*n);
+  for (int k = 0; k < n; k++) {
+    
+    // ici on calcul w = ak dans la formule du cours 
+    copier_vect_vect(n,&A[cpt],&vect_w[cpt]);
+    
+    // for j=1:k-1, rjk= qtjw ,w = w −rjkq end 
+    for (int j = 0; j < k; j++) {
+      coef[j] = somme_mul_vect_vect(n,&vect_w[cpt],&vect_w[j*n]);
+      scal_fois_vect_plus_vect(n,-coef[j],&vect_w[j * n], &vect_w[cpt]);
+    }
+
+    // ici on normalise notre vecteur 
+    double val = (double)(1/norme(&vect_w[cpt],n));
+    scal_fois_vect(n,val,&vect_w[cpt]);
+    
+    cpt=cpt+n;
   }
 
-  // y = b*y
-    if (b == 0)
-    { 
-       while(k<taille_y)
-       {
-        y[k] = 0;
-        k++;
-       }
-    } 
-    else
-    { 
-      k=0;
-      while(k<taille_y)
-      {
-      y[k]=b*y[k];
-      k++;
-      }
-      
-    } 
-   
+  return vect_w;
+}
+
+double *Classical_gs(int n, double *A) {
+
+  int cpt = 0;
+  double *coef,*vect_w;
+  coef= malloc(sizeof(double)*n);
+  vect_w= malloc(sizeof(double)*n*n);
   
-    if (a == 0)
-    return;
+  for (int k = 0; k < n; k++) {
+  
+    // ici on calcul w = ak dans la formule du cours 
+    copier_vect_vect(n,&A[cpt],&vect_w[cpt]);
+
+    // for j = 1:k-1, rjk= qtjw end
+    for (int j = 0; j < k; j++)
+      coef[j] = somme_mul_vect_vect(n,&vect_w[cpt],&vect_w[j * n]);
+
+    // for j = 1:k-1,  w = w −rjkqj end 
+    for (int j = 0; j < k; j++)
+      scal_fois_vect_plus_vect(n,-coef[j],&vect_w[j * n],&vect_w[cpt]);
+
+    // ici on normalise notre vecteur 
+    double val = (double)(1/norme(&vect_w[cpt],n));
+    scal_fois_vect(n,val,&vect_w[cpt]);
+    
+    cpt=cpt+n;
+  }
+    
+  return vect_w;
+}
+
+
+
+void matrice_carre(double **A, int n)
+{
+	for (int i = 0; i < n; i++)
+	{
+		for (int j = 0; j < n; j++)
+		{
+			A[i][j] = i*j+1;
+		}
+	}
+}
+
+double scal(double **V, int j, int i, int m)
+{
+	double S = 0;
+	for (int k = 0; k < m; ++k)
+	{
+		S = S + V[j][k]*V[i][k]; 
+	}
+	return S;
+}
+
+
+
+
+void dotprod_2(double **A, double **V, int j, int n, int m)
+{
+	
+	for (int i = 0; i < n; ++i)
+	{
+		for (int k = 0; k < m; ++k)
+		{
+			V[j+1][k] = V[j+1][k] + A[i][k] * V[k][j+1];
+		}
+	}
 
 }
+
 /*
   A la matrice 
-  b le vecteur initial
+  H la matrice hessenberg  
+  v le vecteur initial
   n la taille de la matrice A
   m la taille du sous espace de projection
-  H la matrice hessenberg 
   V la matrice unitaire 
 
 */
 
-void arnoldi(int n, int m, double *A, double *b, double *H, double *V) 
+void arnoldi(double **A, double *v, int n, int m, double **H, double **V)
 {
-    // on copie le vecteur b dans V
-    for(int i=0; i<n; i++)
-    {
-      V[i]=b[i];  
-    }
-    
-    // 
-    double e=1.0/norme(V,n);
-    
-    for(int i=0; i<n; i++)
-    {
-      V[i]=e*V[i];
-    }
-    
-    int k= n;
-    int h = 0;
-    int j=1;
-    
-    while (j<m)
-    {
-      //dgemv_('n', n, n, 1, A, n, &V[k-n],0,&V[k]);
-      
-      for(int i=0; i<n; i++)
-      {
-      	
-      	H[h+i] = dotprod_simple(&V[k],&V[i*n],n);
-      	for (int r=0; r<n; r++)
-      	{
-      		V[k]=-(H[h+ i])*V[i*n]+V[k];
-      	}
- 
-      }
-      H[h+j] = norme(&V[k],n);
-      for (int t=0; t<n; t++)
-      {
-              V[k]= (1.0/H[h+j]) * V[k];
-      }
 
-      k=k+n;
-      h=h+m+1;
-      
-      j++;
-    }
-   
+	// Initialisation de V1
+	double nb = norme(v, m);
+	for (int i = 0; i < m; ++i)
+	{
+		V[0][i] = v[i] / nb;
+	}
+
+
+	// boucle de calcul global
+	for (int j = 0; j < m-1; ++j)
+	{
+		dotprod_2(A, V, j, n, m);
+		for (int i = 0; i < j; ++i)
+		{
+			H[i][j] = scal(V, j+1, i, m);
+			//ici on doit calculer calcul de Vj+1
+			for (int k = 0; k < m; ++k)
+			{
+				V[j+1][k] = V[j+1][k] - V[i][k]*H[i][j];
+			}
+		}
+
+		H[j+1][j] = norme(V[j+1], m);
+		if (H[j+1][j] == 0)
+		{
+			return ;
+		}
+		//ici on doit calculer de H[j+1][j]
+		for (int k = 0; k < m; ++k)
+		{
+			V[j+1][k] = V[j+1][k]/H[j+1][j];
+		}
+	}
 
 }
+
 
 
 double norme_frobenius(int nb_lig, int nb_col,double *mat)
@@ -160,8 +220,6 @@ double norme(double *x,int taille)
 }
 
 
-
-
 double dotprod_simple(double *x, double *y,int taille)
 {
   double s=0.0;
@@ -173,6 +231,19 @@ double dotprod_simple(double *x, double *y,int taille)
   
   return s;
 }
+
+void affiche_matrice_carree(double **A, int n)
+{
+	for (int i = 0; i < n; ++i)
+	{
+		for (int j = 0; j < n; ++j)
+		{
+			printf("%lf\t", A[i][j]);
+		}
+		printf("\n");
+	}
+}
+
 
 matrice *lire_vector_fixe(char *fichier)
 {
@@ -208,7 +279,6 @@ matrice *lire_vector_fixe(char *fichier)
   return vec;
 }
 
-/*
 
 matrice *lire_matrice(int n, double x, double y) {
 
@@ -233,10 +303,10 @@ matrice *lire_matrice(int n, double x, double y) {
   return mat;
 }
 
-*/
-/*
+
+
 matrice *lire_vector(int n) {
-  // a renvoir car return a vec avec 1 comme val
+  
 
   matrice *vec = aligned_alloc(64,sizeof(matrice));
   vec->nb_lignes=n;
@@ -252,7 +322,7 @@ matrice *lire_vector(int n) {
 
 }
 
-*/
+
 
 void AfficheVecteur(matrice* vec)
 {
@@ -273,6 +343,7 @@ void desaloc_vec(matrice *vec)
   free(vec->valeur);
   free(vec);
 }
+
 void AfficheMatrice(matrice *matrix)
 {
   
@@ -280,7 +351,7 @@ void AfficheMatrice(matrice *matrix)
     {
       for (int j = 0; j < matrix->nb_colonnes; j++)
       {
-              printf("%f ", matrix->valeur[i*matrix->nb_lignes + j]);
+              printf("%lf ", matrix->valeur[i*matrix->nb_lignes + j]);
       }
       printf("\n");
     }
