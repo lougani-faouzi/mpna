@@ -1,0 +1,23 @@
+
+**Rendu Tps Méthodes et Programmation Numériques Avancées***
+                                     
+
+** Pour compiler:
+
+#+BEGIN_SRC bash
+make
+#+END_SRC
+
+** Pour executer:
+
+#+BEGIN_SRC bash
+./main.exe
+#+END_SRC
+
+** Pour supprimer les exec:
+
+#+BEGIN_SRC bash
+make clean
+#+END_SRC
+
+
