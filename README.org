@@ -1,6 +1,6 @@
 
 
-**Rendu Tps Méthodes et Programmation Numériques Avancées***
+**Programmation Numériques Avancées***
                                      
 
 ** Pour compiler:
