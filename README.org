@@ -1,6 +1,8 @@
 
 
-**Programmation Numériques Avancées***
+
+*** Ce dossier contient un rendu des tps réalisés du module Programmation Numériques Avancées M2IHPS
+
                                      
 
 ** Pour compiler:
